@@ -1,0 +1,6 @@
+
+Ładowanie ustawień do pamięci przy pierwszym uruchomieniu
+Obsługa błędu parsowania na JSON odpowiedzi unauthorized
+
+przycisk do wyświetlenia dashboarda
+modal do przeglądania wszystkich zamówień

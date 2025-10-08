@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Setting up basic metadata for character encoding and responsive viewport -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyShop Front Page</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header section with logo, search bar, and user action buttons -->
+    <header>
+        <div class="container" id="headerContainer">
+            <div class="header-top">
+                <!-- Logo display -->
+                <div class="logo">MyShop</div>
+                <!-- Search bar input -->
+                <div class="search-bar">
+                    <input type="text" placeholder="Search products...">
+                </div>
+                <!-- User action buttons with dropdown for Account -->
+                <div class="user-actions">
+                    <button id="signInBtn">Sign In</button>
+                    <button id="loginBtn">Login</button>
+                    <button id="cartBtn">Cart</button>
+                    <!-- Dropdown wrapper for Account button -->
+                    <div class="dropdown">
+                        <button>Account</button>
+                        <!-- Dropdown menu content -->
+                        <div class="dropdown-content">
+                            <a id="profileBtn">Profile</a>
+                            <a id="ordersBtn">Orders</a>
+                            <a id="settingsBtn">Settings</a>
+                            <a id="logoutBtn">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main content with sidebar and product list -->
+    <div class="container main-content">
+        <!-- Sidebar with product categories -->
+        <div class="sidebar" id="categoriesSidebar">
+            <div class="sidebar-header" id="categoriesHeader">
+                <h3>Categories</h3>   
+            </div>
+            <ul id="categoryList"></ul>
+        </div>
+
+        <!-- Product list section -->
+        <div class="product-list">
+            <!-- List of product cards -->
+            <div id="productList" class="product-list-items"></div>
+            <!-- Pagination controls -->
+            <div class="pagination">
+                <button>Previous</button>
+                <button class="active">1</button>
+                <button>2</button>
+                <button>3</button>
+                <button>Next</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Sign In Modal -->
+    <div id="signInModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('signInModal','signInForm')">&times;</span>
+            <h2>Sign In</h2>
+            <form id="signInForm">
+                <input type="text" placeholder="Username" id="signInUsername" name="username" required>
+                <input type="email" placeholder="Email" id="signInEmail" name="email" required>
+                <input type="password" placeholder="Password" id="signInPassword" name="password" required>
+                <input type="password" placeholder="Confirm password" id="signInConfirmPassword" required>
+                <button type="submit" id="signInBtn">Sign In</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('loginModal','loginForm')">&times;</span>
+            <h2>Login</h2>
+            <form id="loginForm">
+                <input type="text" placeholder="Username" required name="username">
+                <input type="password" placeholder="Password" required name="password">
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content modal-content-cart">
+            <span class="close" onclick="closeModal('cartModal')">&times;</span>
+            <h2>Your shopping cart:</h2>
+            <div class="product-list"> 
+                <div id="cartItemsList" class="product-list-items"></div>  
+            </div> 
+            <div class="cart-button-bar">
+                <button id="submitOrderBtn">Submit</button> 
+            </div> 
+              
+        </div>
+    </div>
+
+    <!-- Product Modal -->
+    <div id="productModal" class="modal">
+        <div class="modal-content modal-content-wide">
+            <span class="close" onclick="closeModal('productModal')">&times;</span>
+            <div id="productModalTopSection" class="header-top">
+                <div id="modalImagePanel">
+                    <button><</button>
+                    <img id="modalProductImage" alt="image">
+                    <button>></button>
+                </div>
+                <div id="modalPricePanel">
+                    <h4 id="modalProductPrice"></h4>
+                    <input id="modalQuantitySelector" type="number" min="1" value="1">
+                    <button id="modalAddToCartBtn">Add to cart</button>
+                </div>
+            </div>
+            
+            <div id="modalDescriptionPanel">
+                <h4 id="modalProductName"></h4>
+                <h6 id="modalProductDescription"></h6>
+            </div>    
+        </div>
+    </div>
+
+    <!-- Edit category Modal -->
+    <div id="editCategoryModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('editCategoryModal','editCategoryForm')">&times;</span>
+            <h2>Categories</h2>
+            <form id="editCategoryForm">
+                <label for="newCategoryInput">Category name:</label>
+                <input id="newCategoryInput" required="true">
+                <button id="newCategorySaveBtn" type="submit">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Product input Modal -->
+    <div id="productInputModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('productInputModal','productInputForm')">&times;</span>
+            <h2>Product</h2>
+            <form id="productInputForm">
+                <label for="inputProductName">Product name:</label>
+                <input id="inputProductName" required="true">
+                <label for="inputProductQuantity">Quantity:</label>
+                <input id="inputProductQuantity" type="number" min="0" required="true">
+                <label for="inputProductPrice">Price:</label>
+                <div>
+                    <input id="inputProductPrice" required="true">
+                    <label>USD</label>   
+                </div>
+                <label for="inputProductCategory">Category:</label>
+                <select id="inputProductCategory" required="true"></select>
+                <label for="inputProductDescription">Description:</label>
+                <textarea id="inputProductDescription" type="text" required="true" class="text-field"></textarea>
+                
+                <button id="newProductSaveBtn" type="submit">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('profileModal')">&times;</span>
+            <h2>Profile</h2>
+            <div class="orders-list">
+                <div>
+                    <label for="profileUsername">Username:</label>
+                    <a id="profileUsername"></a>   
+                </div>
+                <div>
+                    <label for="profileEmail">Email:</label>
+                    <a id="profileEmail"></a>    
+                </div>
+                 
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders Modal -->
+    <div id="ordersModal" class="modal">
+        <div class="modal-content modal-content-wide">
+            <span class="close" onclick="closeModal('ordersModal')">&times;</span>
+            <h2>Your Orders</h2>
+            <div class="product-list"> 
+                <div id="ordersList" class="product-list-items"></div>  
+            </div> 
+            <button onclick="closeModal('ordersModal')">Close</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('settingsModal')">&times;</span>
+            <h2>Settings</h2>
+            <form id="settingsForm">
+                <label for="selectedLanguage">Language</label>
+                <select id="languageSelector" name="selectedLanguage">
+                    <option value="ENG">ENG</option>
+                </select>
+                <label for="currencyName">Currency</label>
+                <select id="currencySelector" name="currencyName">
+                    <option value="USD">USD</option>
+                    <option value="PLN">PLN</option>
+                </select>
+                <button type="submit">Save Settings</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Logout Modal -->
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('logoutModal')">&times;</span>
+            <h2>Logout</h2>
+            <p>Are you sure you want to logout?</p>
+            <button id="confirmLogoutBtn">Logout</button>
+            <button onclick="closeModal('logoutModal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- JavaScript for modal functionality -->
+    <script src="index.js"></script>
+</body>
+</html>
