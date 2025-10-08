@@ -359,7 +359,6 @@ async function renderProducts(query)
         addProductBtn.textContent = "Add"
 		addProductBtn.addEventListener("click", async () =>
         {
-            //add request
             const inputProductForm = document.getElementById("productInputForm")
             const inputProductName = document.getElementById("inputProductName")
             const inputProductQuantity = document.getElementById("inputProductQuantity")
@@ -424,20 +423,19 @@ async function renderProducts(query)
 		let productCard = document.createElement("div")
 		productCard.setAttribute("class", "product-card")
 		productCard.setAttribute("id",product.id)
-        productCard.addEventListener("click",() => 
-        {
-            // openModal("productModal")
-            // const modalProductName = document.getElementById("modalProductName")
-            // modalProductName.textContent = product.name
-            // const modalProductDescription = document.getElementById("modalProductDescription")
-            // modalProductDescription.textContent = product.text
-            // const modalProductPrice = document.getElementById("modalProductPrice")
-            // modalProductPrice.textContent = product.price + " " + product.priceCurrency
-        })
-		const productImage = document.createElement("img")
-		//productImage.setAttribute("src", product.image)
+        
 		const productName = document.createElement("h4")
 		productName.textContent = product.name
+        productName.addEventListener("click",() => 
+        {
+            openModal("productModal")
+            const modalProductName = document.getElementById("modalProductName")
+            modalProductName.textContent = product.name
+            const modalProductDescription = document.getElementById("modalProductDescription")
+            modalProductDescription.textContent = product.text
+            const modalProductPrice = document.getElementById("modalProductPrice")
+            modalProductPrice.textContent = product.price + " " + product.priceCurrency
+        })
 
 		const productPrice = document.createElement("p")
 		productPrice.textContent = product.price + " " + product.priceCurrency
