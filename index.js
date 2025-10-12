@@ -3,10 +3,41 @@ window.onload = async () =>
 {
     apiBaseUrl = "http://localhost:5104"
     setupUserActions();
+    loadSettings()
     await renderCategories();
-    await renderProducts({currencyName:localStorage.getItem("currencyName")});
+    await renderProducts();
     await renderAdminPanel();
 
+}
+
+function loadSettings()
+{
+    const sessionParameters = 
+    {
+        searchPhrase: null,
+        selectedCategory: null,
+        pageSize: 5
+    }
+    for(const parameter in sessionParameters)
+    {
+        if(sessionStorage.getItem(parameter) == null)
+        {
+            sessionStorage.setItem(parameter,sessionParameters[parameter])
+        }
+    }
+
+    const localParameters =
+    {
+        currencyName: "USD",
+        selectedLanguage: "ENG"
+    }
+    for(const parameter in localParameters)
+    {
+        if(localStorage.getItem(parameter) == null)
+        {
+            localStorage.setItem(parameter,localParameters[parameter])
+        }
+    }
 }
 
 function setupUserActions()
@@ -145,6 +176,13 @@ function setupUserActions()
             })
                
         });
+
+    const searchBar = document.getElementById("searchBar")
+    searchBar.addEventListener("change",async () => 
+    {
+        sessionStorage.setItem("searchPhrase", searchBar.value)
+        await renderProducts()
+    })
 
 }
 
@@ -305,11 +343,7 @@ async function renderCategories()
 
         categoriesContainer.appendChild(liElement)
         
-    })
-        
-    
-    
-	
+    })	
 }
 
 async function loadCategories()
@@ -319,7 +353,7 @@ async function loadCategories()
 	return data	
 }
 
-function categoryClicked(category)
+async function categoryClicked(category)
 {
 	const categoryElements = document.querySelectorAll(`#categoryList li`)
 	categoryElements.forEach(liElement =>
@@ -329,7 +363,7 @@ function categoryClicked(category)
 	})
 	category.style.fontWeight = 'bold';
     sessionStorage.setItem("selectedCategory",category.getAttribute("data-categoryId"));
-    renderProducts({categoryId: category.getAttribute("data-categoryId"), currencyName: localStorage.getItem("currencyName")});
+    await renderProducts();
 }
 
 async function renderProducts(query)
@@ -337,6 +371,7 @@ async function renderProducts(query)
 	const data = await loadProducts(query)
 	const productsContainer = document.getElementById("productList")
     productsContainer.replaceChildren();
+    renderPagination(data.pageNumber,data.totalPages)
 
     let categories = undefined
 
@@ -417,8 +452,8 @@ async function renderProducts(query)
         addProductCard.appendChild(addProductBtn)
         productsContainer.appendChild(addProductCard)
     }
-     
-	data.forEach(product => 
+    
+	data.items.forEach(product => 
 	{
 		let productCard = document.createElement("div")
 		productCard.setAttribute("class", "product-card")
@@ -552,16 +587,110 @@ async function renderProducts(query)
 	})
 }
 
-async function loadProducts(queryParameters)
+async function loadProducts(pageNumber)
 {
+    const queryParameters =
+    {
+        categoryId: sessionStorage.getItem("selectedCategory"),
+        currencyName: localStorage.getItem("currencyName"),
+        pageSize: sessionStorage.getItem("pageSize"),
+        pageNumber: pageNumber ?? 1,
+        searchPhrase: sessionStorage.getItem("searchPhrase")
+    }
     const query = new URLSearchParams();
     for(const param in queryParameters)
     {
-        if(queryParameters[param] !== null) query.append(param,queryParameters[param]);
+        if(queryParameters[param] != "null") query.append(param,queryParameters[param]);
     }
     const response = await fetch(`${apiBaseUrl}/api/ShopItem/All?` + query.toString())
     const data = await response.json()
 	return data
+}
+
+function renderPagination(pageNumber, totalPages)
+{
+    
+    const paginationPanel = document.getElementById("paginationPanel")
+    paginationPanel.replaceChildren()
+    if(pageNumber > 1)
+    {
+        const previousBtn = document.createElement("button")
+        previousBtn.textContent = "< Previous"
+        previousBtn.addEventListener("click", async () =>
+        {
+            await renderProducts(pageNumber-1);
+        })
+        paginationPanel.appendChild(previousBtn)
+    }
+
+   const firstPageBtn = document.createElement("button")
+   firstPageBtn.textContent = 1
+   if(pageNumber==1)
+   {
+        firstPageBtn.setAttribute("class","active")
+        firstPageBtn.setAttribute("disabled",true)
+   }
+   firstPageBtn.addEventListener("click", async () =>
+    {
+        await renderProducts();
+    })
+   paginationPanel.appendChild(firstPageBtn)
+   if(pageNumber>=5)
+   {
+        const ellipsis = document.createElement("label")
+        ellipsis.textContent = "..."
+        paginationPanel.appendChild(ellipsis)
+   }
+
+   let startRange
+   let endRange
+   if(pageNumber>=5 && totalPages>=5)
+   {
+    startRange = pageNumber-2
+    endRange = totalPages>pageNumber+2 ? pageNumber+2 : totalPages
+   }
+   if(pageNumber<5 && totalPages>=5)
+   {
+    startRange = 2
+    endRange = 5
+   }
+   if(pageNumber<5 && totalPages<5)
+   {
+    startRange = 2
+    endRange = totalPages
+   }
+
+    for(let i = startRange; i <= endRange; i++)
+    {
+        const paginationBtn = document.createElement("button")
+        paginationBtn.textContent = i
+        if(i === pageNumber)
+        {
+            paginationBtn.setAttribute("class","active")
+            paginationBtn.setAttribute("disabled",true)
+        } 
+        paginationBtn.addEventListener("click", async () =>
+            {
+               await renderProducts(i); 
+            })
+        paginationPanel.appendChild(paginationBtn)
+    }
+
+
+   const totalPageslabel = document.createElement("label")
+   totalPageslabel.textContent = `of ${totalPages}`
+   paginationPanel.appendChild(totalPageslabel)
+
+   if(pageNumber!=totalPages)
+    {
+        const nextPageBtn = document.createElement("button")
+        nextPageBtn.textContent = "Next >"
+        nextPageBtn.addEventListener("click",async () =>
+        {
+            await renderProducts(pageNumber+1)
+        })
+        paginationPanel.appendChild(nextPageBtn)
+    }
 }
 
 async function addToCartClicked(productId,productQuantity)
